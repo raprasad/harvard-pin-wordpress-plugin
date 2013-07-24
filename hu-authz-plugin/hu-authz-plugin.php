@@ -20,7 +20,7 @@ function hu_authz_set_default_options_array() {
     if ( get_option( 'hu_authz_options' ) === false ) {
         $authz_options_array = array(            
                 'GPG_DIR' => "/home/p/r/prasad/.gnupg",
-                'PIN_APP_NAME' => "FAS_FCOR_MCB_GRDB_AUTHZ",
+                'PIN_APP_NAME' => "FAS_FCOR_MCB_INTRANET",
                 'CHECK_PIN_IP_VALUE' => 'false',
                 'PRINT_DEBUG_STATMENTS' => 'false'
         );
@@ -32,7 +32,7 @@ function hu_authz_set_default_options_array() {
         
          $authz_options_array = array(            
                     'GPG_DIR' => "/home/p/r/prasad/.gnupg",
-                    'PIN_APP_NAME' => "FAS_FCOR_MCB_GRDB_AUTHZ",
+                    'PIN_APP_NAME' => "FAS_FCOR_MCB_INTRANET",
                     'CHECK_PIN_IP_VALUE' => 'false',
                     'PRINT_DEBUG_STATMENTS' => 'false'
             );

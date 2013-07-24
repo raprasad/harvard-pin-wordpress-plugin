@@ -102,7 +102,7 @@ class AuthZChecker {
         // Is the debug flag set to true via $authz_params (this shows print statements)?
         if (isset($authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS])==true){
     $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
-            $this->show_debug_msg = false;// $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
+            $this->show_debug_msg = $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
         }
     
         // Make sure $authz_params has the needed keys
@@ -204,6 +204,7 @@ class AuthZChecker {
         if(!(is_dir( $this->authz_params[$this->AUTHZ_KEY_GPG_DIR]))){
             $this->err_found = true;
             $this->err_layer1_gnupg_home_directory_not_found = true;
+            $this->err_msg = 'Not a directory: ' . $this->authz_params[$this->AUTHZ_KEY_GPG_DIR];
             
             return;
         }
@@ -226,9 +227,54 @@ class AuthZChecker {
             $this->err_msg = gnupg_geterror($gnupg_resource);
             return;
         }
+
+        /* (3) split decoded (but url encoded) azp_token */
+        // Split the token by '&'; left half -> data; right half -> signature
+        $url_encoded_token_pieces = explode('&', $decrypted_parts);
+        if (count($url_encoded_token_pieces) != 2){
+            $this->err_found = true;
+            $this->err_layer2_decrypt_failed = true;
+            $this->err_msg = 'Number of parts found: ' . count($url_encoded_token_pieces);
+            return;
+        }
         
-        $decrypted_parts = urldecode($decrypted_parts);
-        $this->debug_msg('decrypted_parts: '. $decrypted_parts);
+        # URL is still encoded (uncoding earlier would not allow split above)
+        # (2 extra variables here for debugging)
+        $url_encoded_data_string = $url_encoded_token_pieces[0];
+        $url_encoded_signature_string = $url_encoded_token_pieces[1];
+        
+        # decode url string parts
+        $decoded_data_string = urldecode($url_encoded_data_string); 
+        $decoded_signature_string = urldecode($url_encoded_signature_string); 
+        
+        $this->debug_msg('decoded_data_string: '. $decoded_data_string);
+        $this->debug_msg('decoded_signature_string: '. $decoded_signature_string);
+        
+        // Create the PGP message
+        $pgp_msg = $this->get_pgp_msg($decoded_data_string, $decoded_signature_string);
+    
+        
+        $this->debug_msg('pgp_msg: ->'. $pgp_msg);
+        
+        // Verify the PGP message        
+        $this->debug_msg('verify PGP msg...');
+        
+        // clearsigned
+        $gpg_verification_info = gnupg_verify($gnupg_resource, $pgp_msg, false);//,$plaintext);
+        print_r($gpg_verification_info);
+        if ($this->is_gpg_verification_valid($gpg_verification_info)){
+            $this->debug_msg('verified!');            
+        }else{
+            $this->debug_msg('failed!');  
+            $this->err_found = true;
+            $this->err_layer2_signature_fail = true;
+            return;
+                                  
+        }
+        
+        $this->debug_msg('????????');
+        
+        
 
         /* ------------------------------------------------------ 
             Layer 2: Unencrypted Data and Signature Strings
@@ -236,13 +282,7 @@ class AuthZChecker {
            - check that the first parameter has been encoded with the 
             AuthZProxy's PGP private key
           ------------------------------------------------------ */
-
-        /* ------------------------------------------------------ 
-        Layer 3: Authentication Data and Attribute List Strings
-        e.g. 12345678|2012-12-06T17:18:44Z|140.247.10.93|FAS_FCOR_DEPT_APP_AUTHZ|P&mail=bill_murray%40harvard.edu|sn=Murray|givenname=Bill
-        ------------------------------------------------------ */
-        // Skip for now
-        $decrypted_data = explode('&', $decrypted_parts);
+        $decrypted_data = explode('&', $decoded_data_string);
         
         $this->debug_msg('decrypted_data');
         $this->debug_show_array($decrypted_data);
@@ -252,10 +292,23 @@ class AuthZChecker {
             $this->err_layer3_not_two_parts = true;
             return;
         }
+
         $authentication_data = $decrypted_data[0];
         $this->debug_msg("authentication_data: $authentication_data");
+
+        /* ------------------------------------------------------ 
+            Check authentication data against the HU PIN public key
+            ------------------------------------------------------ */
+        
+
+
+        /* ------------------------------------------------------ 
+        Layer 3: Authentication Data and Attribute List Strings
+        e.g. 12345678|2012-12-06T17:18:44Z|140.247.10.93|FAS_FCOR_DEPT_APP_AUTHZ|P&mail=bill_murray%40harvard.edu|sn=Murray|givenname=Bill
+        ------------------------------------------------------ */
+
                 
-        $attribute_data = $decrypted_data[1];
+        $attribute_data = urldecode($decrypted_data[1]);
         $this->debug_msg("attribute_data: $attribute_data");
         
         /* ------------------------------------------------------
@@ -367,6 +420,52 @@ class AuthZChecker {
 
     } // end check_azp_token
 
+    function is_gpg_verification_valid($gpg_verification_info){
+        
+        if (gettype($gpg_verification_info)!= 'array'){
+            return False;
+        }
+    
+        
+        if (count($gpg_verification_info) == 0){
+            return False;            
+        }
+        
+        $verify_info = $gpg_verification_info[0];
+        
+        if (!(array_key_exists('fingerprint', $verify_info))){
+            return False;
+        }
+
+        if (!(array_key_exists('status', $verify_info))){
+            return False;
+        }
+        
+        if ($verify_info['status']== '0'){
+            
+            return True;
+        }
+        
+        return False;
+
+    } // end is_gpg_verification_valid
+    
+            
+            
+    function get_pgp_msg($decoded_data_string, $decoded_signature_string){
+        // courtesy of pinserver_plus module 
+        $pgp_message = "-----BEGIN PGP SIGNED MESSAGE-----" . "\n";
+        $pgp_message .= "Hash: SHA1" . "\n";
+        $pgp_message .= "\n";
+        $pgp_message .= $decoded_data_string . "\n";
+        $pgp_message .= "-----BEGIN PGP SIGNATURE-----" . "\n";
+        $pgp_message .= "Version: 5.0" . "\n";
+        $pgp_message .= "\n";
+        $pgp_message .= $decoded_signature_string . "\n";
+        $pgp_message .= "-----END PGP SIGNATURE-----" . "\n";
+
+        return $pgp_message;
+    }
     
     function get_error_msg_html(){
         
@@ -389,7 +488,7 @@ class AuthZChecker {
             $err_lines[] =  'Failed to decrypt url with private key.  (id: err_layer1_decrypt_failed)';
         }
         if ($this->err_layer2_decrypt_failed){
-            $err_lines[] =  'Failed layer 2 decrypt.  (id: err_layer2_decrypt_failed)';
+            $err_lines[] =  'The decrypted encoded url string was not 2 parts when split by "&".  (id: err_layer2_decrypt_failed)';
         }
         if ($this->err_layer2_signature_fail){
             $err_lines[] =  'Failed to verify signature with public key.  (id: err_layer2_signature_fail)';
@@ -432,15 +531,16 @@ class AuthZChecker {
     Test Run
  ---------------------------------------- */
 
-/*     
+
 
 // uncomment this to run the "authz_checker.php" file directly
+/*
+// start: run AuthZChecker directly
     $my_authz_params = array(
          "GPG_DIR" => '/home/p/r/user/.gnupg',
-         "PIN_APP_NAME" => 'FAS_FCOR_DEPT_APP_AUTHZ',
+         "PIN_APP_NAME" => 'FAS_FCOR_MCB_INTRANET',
          "CHECK_PIN_IP_VALUE" => false,
-         "PRINT_DEBUG_STATMENTS" => true
-         );
+         "PRINT_DEBUG_STATMENTS" => true);
          
     $authz_checker = new AuthZChecker($_GET, $my_authz_params); // use the actual get string
     print_r($_GET);
@@ -451,6 +551,7 @@ class AuthZChecker {
         print "<h2>err</h2>";
         print $authz_checker->get_error_msg_html();
     };
-*/
+// end: run AuthZChecker directly
 
+*/
 ?>
