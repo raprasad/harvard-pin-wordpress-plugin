@@ -7,9 +7,10 @@
 
 function is_email_in_mcb_directory(){
 
-    $response = wp_remote_get( "https://www.mcb.harvard.edu/mcb/directory/check_user?e=$email_address" );
+    $response = wp_remote_get(
+"https://www.mcb.harvard.edu/mcb/directory/check_user/?e=$email_address" );
     $ext_auth = json_decode( $response['body'], true );
-    if( $ext_auth['result'] == 1 ) {
+    if( $ext_auth['in_mcb_directory'] == 1 ) {
         return true;
     }
     return false;
