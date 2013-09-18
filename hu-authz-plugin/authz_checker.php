@@ -100,9 +100,17 @@ class AuthZChecker {
     function __construct($GET_ARRAY, $authz_params) {
 
         // Is the debug flag set to true via $authz_params (this shows print statements)?
-        if (isset($authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS])==true){
+        if (isset($authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS])){
             //$authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
-            $this->show_debug_msg = $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
+            if (($authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS]) == 'true'){
+                $this->show_debug_msg = true;
+            }else{
+                $this->show_debug_msg = false;
+            }
+            //$this->show_debug_msg = $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
+            //print '<h2>set to the following: ' .$this->show_debug_msg . '</h2>';
+        }else{
+            $this->show_debug_msg = false;
         }
     
         // Make sure $authz_params has the needed keys

@@ -205,7 +205,6 @@ function hu_pin2_authz_check(){
     
     if (!(is_email_in_mcb_directory($user_email))){
         
-        print_r($authz_checker->authz_params);
         show_fail_message('Sorry!  Your email was not in the MCB directory.  Please make sure you are listed in the <a href="https://www.mcb.harvard.edu/mcb/directory/search/">MCB directory</a>.');
         return;        
     }
