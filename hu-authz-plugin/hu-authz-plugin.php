@@ -8,6 +8,7 @@ Author: Raman Prasad
 Author URI: http://www.mcb.harvard.edu
 License: GPLv2
 */
+
 require_once('authz_checker.php');  // pull in the the AuthZChecker class
 
 register_activation_hook( __FILE__, 'hu_authz_set_default_options_array' );
@@ -116,11 +117,11 @@ function login_wp_user_from_hu_authz($wp_user_data){
 
     // (5) Delete the user credentials (possible extra step but want to avoid caching)
     wp_cache_delete($existing_user->ID, 'users');
-    print "<p>wp_cache_delete";
+    //print "<p>wp_cache_delete";
     
     // (6) Re-retrieve user with newly set password
     $wp_user = get_user_by( 'login', $wp_user_data['user_login']);  
-    print '<p>next line?';
+    //print '<p>next line?';
 
     // (7) Log the user in with the new password
     $creds = array();
@@ -130,8 +131,10 @@ function login_wp_user_from_hu_authz($wp_user_data){
 
     $logged_in_user = wp_signon( $creds, false );
     if ( is_wp_error($logged_in_user) ){
-        print $logged_in_user->get_error_message();
-        print 'Login failed';
+        //print $logged_in_user->get_error_message();
+        show_fail_message('Sorry! Login failed');
+        show_fail_message($logged_in_user->get_error_message());
+        
         return;
     }
 
@@ -178,10 +181,22 @@ function hu_pin2_authz_check(){
      -------------------------------- */
     
     // Pull the user information from the AuthZ checker
-    $wp_user_data = $authz_checker->get_wp_user_data_array_direct();
+    $wp_user_data = $authz_checker->get_wp_user_data_array_direct();    
     if ($wp_user_data == null){
         show_fail_message('Sorry!  Failed to retrieve the user data from the Pin Login!');
         return;
+    }
+    
+    $user_email = $authz_checker->get_user_email();
+    if ($user_email === NULL){
+        show_fail_message('Sorry!  Your email was not found.  Please make sure your email is in the Harvard directory.');
+        return;
+    }
+    
+    if (!(is_email_in_mcb_directory($user_email))){
+        show_fail_message('Sorry!  Your email was not in the MCB directory.  Please make sure you are listed in the <a href="https://www.mcb.harvard.edu/mcb/directory/search/">MCB directory</a>.');
+        return;
+        
     }
     
     // Log in with the $wp_user_data

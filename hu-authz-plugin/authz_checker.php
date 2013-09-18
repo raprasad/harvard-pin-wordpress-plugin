@@ -101,7 +101,7 @@ class AuthZChecker {
 
         // Is the debug flag set to true via $authz_params (this shows print statements)?
         if (isset($authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS])==true){
-    $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
+            //$authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
             $this->show_debug_msg = $authz_params[$this->AUTHZ_KEY_PRINT_DEBUG_STATMENTS];
         }
     
@@ -181,6 +181,13 @@ class AuthZChecker {
          return $this->get_wp_user_data_array_direct();
     }
     
+    function get_user_email(){
+        if (array_key_exists("mail",$this->custom_attributes)){
+            return $this->custom_attributes['mail'];
+        }else{
+            return null;
+        }
+    }
     function get_wp_user_data_array_direct(){
         // Build an array of user data for Wordpress
         $this->debug_msg_bold('Return WP user data (get_wp_user_data_array)');
@@ -196,6 +203,7 @@ class AuthZChecker {
 		return $wp_userdata;
     }
 
+    
  
     function check_azp_token(){
         $this->debug_msg_bold('Check Authz Token');
