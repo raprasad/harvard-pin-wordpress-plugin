@@ -68,7 +68,7 @@ function hu_authz_set_default_options_array() {
 }
 
 function show_fail_message($err_msg){
-    print '<div style="border:2px solid #ff0000;margin:20px; padding:20px; width:400px;"><b>PIN Login Failed</b><p>'. $err_msg . '</p></div>';
+    print '<center><div style="border:2px solid #ff0000;margin:20px; padding:20px; width:400px;"><b>PIN Login Failed</b><p>'. $err_msg . '</p></div></center>';
     
 }
 
@@ -148,6 +148,7 @@ function login_wp_user_from_hu_authz($wp_user_data){
 
 function hu_pin2_authz_check(){
     
+    hu_authz_set_default_options_array();
     
     // (1) If we're not on the login page, then leave
     if(!(in_array($GLOBALS['pagenow'], array('wp-login.php')))){
@@ -176,17 +177,26 @@ function hu_pin2_authz_check(){
     // Use the GET string, the AuthZChecker processes the url value indicated by the key "_azp_token"
     $authz_checker = new AuthZChecker($_GET, $authz_options_array);
 
-    /* --------------------------------
-        START: temporarily skipping the authz error check, using a test url
-     -------------------------------- */
     
+    // If there's an authentication error, then fail and return an error message
+    if ($authz_checker->has_err()== true){
+        print '<div style="width:400px;border:2px solid #ff0000;margin:20px; padding:20px"><b>PIN Login Failed</b><p>';
+
+         print  $authz_checker->get_error_msg_html();
+         print '</p></div>';
+         return;
+     }
+
     // Pull the user information from the AuthZ checker
     $wp_user_data = $authz_checker->get_wp_user_data_array_direct();    
     if ($wp_user_data == null){
         show_fail_message('Sorry!  Failed to retrieve the user data from the Pin Login!');
         return;
     }
-    
+
+    //----------------------------------------
+    // Does the email from PIN login match an email in the MCB directory?
+    //----------------------------------------
     $user_email = $authz_checker->get_user_email();
     if ($user_email === NULL){
         show_fail_message('Sorry!  Your email was not found.  Please make sure your email is in the Harvard directory.');
@@ -194,38 +204,19 @@ function hu_pin2_authz_check(){
     }
     
     if (!(is_email_in_mcb_directory($user_email))){
-        show_fail_message('Sorry!  Your email was not in the MCB directory.  Please make sure you are listed in the <a href="https://www.mcb.harvard.edu/mcb/directory/search/">MCB directory</a>.');
-        return;
         
+        print_r($authz_checker->authz_params);
+        show_fail_message('Sorry!  Your email was not in the MCB directory.  Please make sure you are listed in the <a href="https://www.mcb.harvard.edu/mcb/directory/search/">MCB directory</a>.');
+        return;        
     }
+    //----------------------------------------
     
+    //----------------------------------------
     // Log in with the $wp_user_data
+    //----------------------------------------
     login_wp_user_from_hu_authz($wp_user_data);
     return;
-    /* --------------------------------
-      END: temp
-    -------------------------------- */
-      
-    //
-    // If there's an authentication error, then fail and return an error message
-   if ($authz_checker->has_err()== true){
-       print '<div style="width:400px;border:2px solid #ff0000;margin:20px; padding:20px"><b>PIN Login Failed</b><p>';
-       
-        print  $authz_checker->get_error_msg_html();
-        print '</p></div>';
-        return;
-    }
-    
-    // Pull the user information from the AuthZ checker
-    $wp_user_data = $authz_checker->get_wp_user_data_array_safe();
-    if ($wp_user_data == null){
-        show_fail_message('Sorry!  Failed to retrieve the user data from the Pin Login!');
-        return;
-    }
-    
-    // Log in with the $wp_user_data
-    login_wp_user_from_hu_authz($wp_user_data);
-
+  
 }  // end hu_pin2_authz_check
 
 ?>

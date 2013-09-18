@@ -140,17 +140,17 @@ class AuthZChecker {
     }
     
     function debug_show_array($arr){
-        if ($this->show_debug_msg){
+        if ($this->show_debug_msg==true){
             print_r($arr);
         }
     }
     function debug_msg($msg){
-        if ($this->show_debug_msg){
+        if ($this->show_debug_msg==true){
             print '<div style="padding:5px 15px;">' . $msg . '</div>';
         }
     }
     function debug_msg_bold($msg){
-        if ($this->show_debug_msg){
+        if ($this->show_debug_msg==true){
             print '<br /><br /><b>' . $msg . '</b>';
         }
     }
@@ -269,7 +269,7 @@ class AuthZChecker {
         
         // clearsigned
         $gpg_verification_info = gnupg_verify($gnupg_resource, $pgp_msg, false);//,$plaintext);
-        print_r($gpg_verification_info);
+        //print_r($gpg_verification_info);
         if ($this->is_gpg_verification_valid($gpg_verification_info)){
             $this->debug_msg('verified!');            
         }else{
@@ -422,6 +422,7 @@ class AuthZChecker {
              $this->err_layer4_token_time_elapsed = true;
              $this->err_msg = 'More than 120 seconds elapsed [' . $elapsed_seconds. ' seconds]';
              return;
+             
          }
          $this->debug_msg("ok");
          
@@ -474,10 +475,13 @@ class AuthZChecker {
 
         return $pgp_message;
     }
-    
+    function get_login_again_msg(){
+        return '<p>Please try to <a href="/wp-login.php">login again</a>.</p>';
+    }
     function get_error_msg_html(){
         
         $err_lines = array();
+        $add_login_again_msg = false;
         
         if ($this->err_found == false){
             $err_lines[] = 'No Error';
@@ -485,6 +489,8 @@ class AuthZChecker {
 
         if ($this->err_url_parse){
             $err_lines[] =  'Failed to parse url.  (id: err_url_parse)';
+            $add_login_again_msg = true;
+            
         }
         if ($this->err_no_azp_token){
             $err_lines[] =  'AuthZProxy token not found (_authz_token).  (id: err_no_azp_token)';
@@ -520,12 +526,20 @@ class AuthZChecker {
             $err_lines[] =  'Failed to pass IP address check.  (id: err_layer4_app_name_not_matched)';
         }
         if ($this->err_layer4_token_time_elapsed){
-            $err_lines[] =  "Too much time passed.  Token has elapsed.  (More than $this->expiration_limit_in_seconds seconds have passed).  (id: err_layer4_token_time_elapsed)";
+            
+            $err_lines[] =  "Too much time passed.  Pin Login has elapsed.";
+            $add_login_again_msg = true;
+            #$err_lines[] =  $this->err_msg;
+            //$err_lines[] =  "<br />(id: err_layer4_token_time_elapsed)";
+            
         }
 
 
-        if ($this->err_msg != ''){
-            $err_lines[] =  $this->err_msg;
+        if ($this->err_msg){
+            $err_lines[] = $this->err_msg;
+            if ($add_login_again_msg){
+                $err_lines[] = $this->get_login_again_msg();
+            }
         }
         
         return implode("<br />", $err_lines);
