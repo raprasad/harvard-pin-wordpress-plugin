@@ -129,7 +129,7 @@ function login_wp_user_from_hu_authz($wp_user_data){
     $creds['user_password'] = $onetime_password;
     $creds['remember'] = true;
 
-    $logged_in_user = wp_signon( $creds, false );
+    $logged_in_user = wp_signon( $creds, true );
     if ( is_wp_error($logged_in_user) ){
         //print $logged_in_user->get_error_message();
         show_fail_message('Sorry! Login failed');
