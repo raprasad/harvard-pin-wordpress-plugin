@@ -11,6 +11,32 @@
 ?>
 <?php
 
+/*
+NOTES:
+
+(1) get page id:   global $post; echo "pageid: ".$post->ID;
+
+(2) get parent: $post->post_parent
+
+(3) siblings = wp_list_pages( 'echo=1&child_of=' . $page . '&title_li=<h2>Sub Pages x1 ' . get_the_title($id) . '</h2>'  );
+
+sample:
+global $post;
+
+$page_id = $post->ID;
+if ($post->post_parent){
+    $parent_id = post->post_parent->ID;
+    $siblings = wp_list_pages( 'echo=1&child_of=' . $parent_id . '&title_li=<h2>siblings</h2>');
+}else{
+    $siblings = '';
+}
+$children= wp_list_pages( 'echo=1&child_of=' . $page_id . '&title_li=<h2>' . get_the_title($page_id) . '</h2>'  );
+?>
+
+
+
+*/
+
 function get_mcb_child_pages(){
 
     global $id;
