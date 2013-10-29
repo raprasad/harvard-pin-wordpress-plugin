@@ -8,8 +8,6 @@
  * @subpackage Twenty_Twelve
  * @since Twenty Twelve 1.0
  */
-?>
-<?php
 
 /*
 NOTES:
@@ -31,35 +29,51 @@ if ($post->post_parent){
     $siblings = '';
 }
 $children= wp_list_pages( 'echo=1&child_of=' . $page_id . '&title_li=<h2>' . get_the_title($page_id) . '</h2>'  );
-?>
-
-
 
 */
+?>
 
+<?php
+
+$MCB_INTRANET_HOMEPAGE_ID = 55;
 function get_mcb_child_pages(){
+    global $post;   //  access the post variable
+    global $MCB_INTRANET_HOMEPAGE_ID;
+ $pg_output = 'nada';
+    $page_id = $post->ID;
+    $pg_output .= '<br />page_id: ' . $page_id . '<br />post: ' . $post->ID;
+    //return $pg_output;
+    if ($post->post_parent){
+        $pg_output .= '<br />post_parent: ' . $post->post_parent; 
 
-    global $id;
+        $sibling_page_args = array("exclude"=>"'".$MCB_INTRANET_HOMEPAGE_ID . "," . $page_id . "'",
+                         "depth"=> 1,
+                         "echo"=> 0,
+                         "child_of"=> $post->post_parent,
+                         "title_li"=> ""
+                         );
+        $sibling_content = wp_list_pages($sibling_page_args);
+        if ($sibling_content){
+            $pg_output .= "<div style='border:1px solid #ccc;'><ul>$sibling_content</ul></div>";
+            //str_replace('<li class="','<li class="lastlink ',$lastpage);
+            
+        }
+    }
     
-    $output = '';// wp_list_pages('echo=1&depth=1&title_li=<h2>Top Level Pages </h2>' );
-    if (is_page( )) {
-      $page = $post->ID;
-      
-      if ($post->post_parent) {
-        $page = $post->post_parent;
-      }
-      $page = $id;
-      $children= wp_list_pages( 'echo=1&child_of=' . $page . '&title_li=<h2>Sub Pages x1 ' . get_the_title($id) . '</h2>'  );
-      //$children = '<ul class="xoxo blogroll">' . $children . '</ul>';
-     
-     // $children=wp_list_pages( 'echo=1&child_of=' . $page . '&title_li=<h2>Sub Pages x ' . get_the_title($id) . '</h2>'  );
-      if ($children) {
-       // $output = wp_list_pages ('echo=1&child_of=' . $page . '&title_li=<h2>Sub Pages y' . get_the_title($id) . '</h2>' );
-     //   return 'page id: '. $page . '<ul class="xoxo blogroll">rp sub3' .  $output . '</ul>';
-      }
-    } 
-    return $output;
-} // end get_mcb_child_pages
+    $subpage_args = array( "exclude"=>"'".$MCB_INTRANET_HOMEPAGE_ID . "," . $page_id . "'",
+                         "depth"=> 1,
+                         "echo"=> 0,
+                         "child_of"=> $page_id,
+                         "title_li"=> "Sub Pages"
+                         );
+    $subpage_content = wp_list_pages($subpage_args);
+     if ($subpage_content){
+         $pg_output .= $subpage_content;
+     }
+         $pg_output .= '<br />2hullo';//<br >opt:' . $sibling_page_args['depth'];      
+   return $pg_output;
+}
+
 ?>
 
 <!-- Regular sidebar -->
