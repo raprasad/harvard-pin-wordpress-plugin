@@ -9,44 +9,30 @@
  * @since Twenty Twelve 1.0
  */
 
-/*
-NOTES:
 
-(1) get page id:   global $post; echo "pageid: ".$post->ID;
-
-(2) get parent: $post->post_parent
-
-(3) siblings = wp_list_pages( 'echo=1&child_of=' . $page . '&title_li=<h2>Sub Pages x1 ' . get_the_title($id) . '</h2>'  );
-
-sample:
-global $post;
-
-$page_id = $post->ID;
-if ($post->post_parent){
-    $parent_id = post->post_parent->ID;
-    $siblings = wp_list_pages( 'echo=1&child_of=' . $parent_id . '&title_li=<h2>siblings</h2>');
-}else{
-    $siblings = '';
-}
-$children= wp_list_pages( 'echo=1&child_of=' . $page_id . '&title_li=<h2>' . get_the_title($page_id) . '</h2>'  );
-
-*/
 ?>
 
 <?php
 
 $MCB_INTRANET_HOMEPAGE_ID = 55;
-function get_mcb_child_pages(){
+function get_subpage_and_sibling_links(){
     global $post;   //  access the post variable
     global $MCB_INTRANET_HOMEPAGE_ID;
- $pg_output = 'nada';
-    $page_id = $post->ID;
-    $pg_output .= '<br />page_id: ' . $page_id . '<br />post: ' . $post->ID;
-    //return $pg_output;
-    if ($post->post_parent){
-        $pg_output .= '<br />post_parent: ' . $post->post_parent; 
 
-        $sibling_page_args = array("exclude"=>"'".$MCB_INTRANET_HOMEPAGE_ID . "," . $page_id . "'",
+    $debug_str = '';
+    $page_id = $post->ID;
+    $debug_str .= '<br />page_id: ' . $page_id . '<br />post: ' . $post->ID;
+
+    $subpage_content_html = '';
+    $sibling_content_html = '';
+
+    //-----------------
+    // Sibling Pages
+    //-----------------
+    if ($post->post_parent){
+        $debug_str .= '<br />post_parent: ' . $post->post_parent; 
+
+        $sibling_page_args = array("exclude"=>"'".$MCB_INTRANET_HOMEPAGE_ID . "'",
                          "depth"=> 1,
                          "echo"=> 0,
                          "child_of"=> $post->post_parent,
@@ -54,24 +40,32 @@ function get_mcb_child_pages(){
                          );
         $sibling_content = wp_list_pages($sibling_page_args);
         if ($sibling_content){
-            $pg_output .= "<div style='border:1px solid #ccc;'><ul>$sibling_content</ul></div>";
+            $sibling_content_html = '<div id="pg-siblings"><h3 class="widget-title">Related</h3><ul>' . $sibling_content . "</ul></div>";
             //str_replace('<li class="','<li class="lastlink ',$lastpage);
-            
+        }else{
+            $sibling_content_html = '';
         }
     }
     
+    //-----------------
+    // Sub/Child Pages
+    //-----------------
+
     $subpage_args = array( "exclude"=>"'".$MCB_INTRANET_HOMEPAGE_ID . "," . $page_id . "'",
                          "depth"=> 1,
                          "echo"=> 0,
                          "child_of"=> $page_id,
-                         "title_li"=> "Sub Pages"
+                         "title_li"=> ""
                          );
-    $subpage_content = wp_list_pages($subpage_args);
+     $subpage_content = wp_list_pages($subpage_args);
      if ($subpage_content){
-         $pg_output .= $subpage_content;
+         $subpage_content_html = '<div id="pg-subs"><h3 class="widget-title">Sub Pages</h3><ul>' . $subpage_content . "</ul></div>";
+         
+     }else{
+         $subpage_content_html = '';
      }
-         $pg_output .= '<br />2hullo';//<br >opt:' . $sibling_page_args['depth'];      
-   return $pg_output;
+         $debug_str .= '<br />2hullo';//<br >opt:' . $sibling_page_args['depth'];      
+   return $subpage_content_html . $sibling_content_html;
 }
 
 ?>
@@ -80,7 +74,7 @@ function get_mcb_child_pages(){
 
 	<?php if ( is_active_sidebar( 'sidebar-1' ) ) : ?>
 		<div id="secondary" class="widget-area" role="complementary">
-            <?php echo get_mcb_child_pages(); ?>
+            <?php echo get_subpage_and_sibling_links(); ?>
 			<?php dynamic_sidebar( 'sidebar-1' ); ?>
 		</div><!-- #secondary -->
 	<?php endif; ?>

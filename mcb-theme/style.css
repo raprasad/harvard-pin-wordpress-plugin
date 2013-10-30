@@ -4,7 +4,7 @@
  Description:    MCB Theme - Child Theme of Twenty Twelve
  Author:         R. Prasad
  Author URI:     http://internal.mcb.harvard.edu
- Template:       twentywelve
+ Template:       twentytwelve
  Version:        1.0.0
 */
 
@@ -12,3 +12,18 @@
 
 /* =Theme customization starts here
 -------------------------------------------------------------- */
+.header-image {  margin-top:0}
+
+#pg-siblings { padding:0 0 20px 0;}
+#pg-siblings ul li {line-height:150%;}
+#pg-siblings ul li a { color:#21759b;}
+#pg-siblings ul li a:hover { color:#0f3647; }
+#pg-siblings ul li.current_page_item a{ font-weight:bold; text-decoration:none; color:#333;}
+
+#pg-subs { padding:0 0 20px 0;}
+#pg-subs ul li {line-height:150%;}
+#pg-subs ul li a { color:#21759b;}/*  757575 */
+#pg-subs ul li a:hover { color:#0f3647; }
+
+div.breadcrumb-trail {margin:0; font-size:90%;}
+div.breadcrumb-trail span.trail-end {}
