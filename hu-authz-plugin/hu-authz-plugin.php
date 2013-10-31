@@ -15,17 +15,6 @@ register_activation_hook( __FILE__, 'hu_authz_set_default_options_array' );
 
 add_action('init', 'hu_pin2_authz_check');
 
-/* ------------------------------------------------
-    Login page customizations
------------------------------------------------- */
-/* login page: remove the lost password link */
-function remove_lostpassword_text ( $text ) {
-         if ($text == 'Lost your password?'){$text = '';}
-                return $text;
-         }
-add_filter( 'gettext', 'remove_lostpassword_text' );
-
-/* end: remove_lostpassword_text */
 
 /* custom css on top of page */
 /*
@@ -139,7 +128,8 @@ function login_wp_user_from_hu_authz($wp_user_data){
     }
 
     // redirect to the front page
-    wp_safe_redirect('https://mcbintranet.unix.fas.harvard.edu');
+    //wp_safe_redirect('https://mcbintranet.unix.fas.harvard.edu');
+    wp_safe_redirect('https://internal.mcb.harvard.edu');
     
 } // login_wp_user_from_hu_authz
 

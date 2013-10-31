@@ -1,0 +1,5 @@
+logo: /wp-content/uploads/2013/10/fall-intranet_4953updated.png
+
+height: 326
+
+logo link: https://www.pin1.harvard.edu/pin/authenticate?__authen_application=FAS_FCOR_MCB_INTRANET
