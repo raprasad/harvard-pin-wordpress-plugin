@@ -13,6 +13,9 @@
 /* =Theme customization starts here
 -------------------------------------------------------------- */
 .header-image {  margin-top:0}
+
+/*.main-navigation li a {line-height:1.2; padding-bottom:12px; padding-top:12px;}*/
+
 #pg-siblings { padding:0 0 20px 0;}
 #pg-siblings ul li {line-height:150%;}
 #pg-siblings ul li a { color:#21759b;}
