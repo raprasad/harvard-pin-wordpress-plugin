@@ -1,0 +1,45 @@
+RewriteEngine On
+Options +FollowSymlinks -Indexes
+
+Order deny,allow
+Deny from all 
+
+#Allow from 140.247
+#Allow from 128.103
+#Allow from 10.251
+Allow from all
+
+
+# ==================================
+# BEGIN WordPress related Rewrites 
+# -----------------------------------
+# (1) Required for PIN LOGIN!  
+#     Send the AuthZ callback querystring to the wp-login page
+# -----------------------------------
+RewriteRule ^hu-azp/callback /wp-login.php
+
+# -----------------------------------
+# (2) Block access from non-Harvard networks.  
+#     Allow 140.247, 128.103, and 10.251
+#     For others, show the "out of network" message
+# -----------------------------------
+
+# Block the admin pages
+RewriteCond %{REMOTE_ADDR} !^(140\.247|128\.103|10\.251)
+RewriteRule ^wp-admin /out-of-network/
+
+# Block the login page
+RewriteCond %{REMOTE_ADDR} !^(140\.247|128\.103|10\.251)
+RewriteRule ^wp-login\.php$ /out-of-network/
+
+# Block the content pages
+RewriteCond %{REMOTE_ADDR} !^(140\.247|128\.103|10\.251)
+#RewriteCond %{QUERY_STRING} ^page_id=([0-9]{1,12})$
+RewriteRule ^/?$ /out-of-network/
+
+# ----------------------------------
+# END WordPress
+# ==================================
+
+~                                                                                                                                                                      
+~
