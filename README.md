@@ -21,6 +21,10 @@ Login to Wordpress using a Harvard Pin with the AuthZProxy service
   
 #### Installation
 
-* Move files to your plugins directory and activate
-
-* Set the following attributes: 
+* Copy the directory "hu-authz-plugin" to your plugins directory 
+* Within this file "hu-authz-plugin/hu-authz-plugin.php", set the following attributes: 
+    * 'GPG_DIR' => "/home/p/r/prasad/.gnupg",
+    * 'PIN_APP_NAME' => "FAS_FCOR_MCB_INTRANET",
+    * 'CHECK_PIN_IP_VALUE' => 'false',
+    * 'PRINT_DEBUG_STATMENTS' => 'false'
+* Activate the plugin through the Wordpress admin
