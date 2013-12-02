@@ -3,6 +3,7 @@
 // ------------------------------------------------ 
 // login page: remove the lost password link */
 // ------------------------------------------------ 
+// commented out b/c plugin "Private Only" uses this function
 /*function xremove_lostpassword_text ( $text ) {
          if ($text == 'Lost your password?'){$text = '<a id="lnk_show_login_form">(Show Admin Login Form)</a>';}
                 return $text;
@@ -68,5 +69,16 @@ function my_login_stylesheet() { ?>
   
 <?php }
 add_action( 'login_enqueue_scripts', 'my_login_stylesheet' );
+
+// Javascript to updated the nav menu--adding a <br /> to the Postdocs & Research Associates nav item
+function postdoc_linebreak_script() {
+	wp_enqueue_script(
+		'postdoc_nav_linebreak',
+		get_template_directory_uri() . '/js/postdoc_nav_linebreak.js',
+		array('jquery')
+	);
+}
+add_action('wp_enqueue_scripts', 'postdoc_linebreak_script');
+
 
 ?>
