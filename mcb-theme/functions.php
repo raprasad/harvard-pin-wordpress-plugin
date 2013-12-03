@@ -63,6 +63,12 @@ function my_login_stylesheet() { ?>
             $('#loginform').show();   
             $("#lnk_show_login_form").hide()
         });
+        
+        // Hide lost password link, if it exists
+        $("a:contains('Lost your password')").hide();
+
+        
+        //$('a').filter(function(index) { return $(this).text() === "Lost your password"; });
     });
     </script>
     
@@ -74,11 +80,11 @@ add_action( 'login_enqueue_scripts', 'my_login_stylesheet' );
 function postdoc_linebreak_script() {
 	wp_enqueue_script(
 		'postdoc_nav_linebreak',
-		get_template_directory_uri() . '/js/postdoc_nav_linebreak.js',
+		get_stylesheet_directory_uri()  . '/js/postdoc_nav_linebreak.js',
 		array('jquery')
 	);
 }
-add_action('wp_enqueue_scripts', 'postdoc_linebreak_script');
+//add_action('wp_enqueue_scripts', 'postdoc_linebreak_script');
 
 
 ?>
