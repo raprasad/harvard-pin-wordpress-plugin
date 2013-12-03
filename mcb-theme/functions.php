@@ -67,7 +67,7 @@ function my_login_stylesheet() { ?>
         // Hide lost password link, if it exists
         $("a:contains('Lost your password')").hide();
 
-        
+
         //$('a').filter(function(index) { return $(this).text() === "Lost your password"; });
     });
     </script>
