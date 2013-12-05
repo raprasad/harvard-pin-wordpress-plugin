@@ -20,7 +20,7 @@
 #pg-siblings ul li {line-height:150%;}
 #pg-siblings ul li a { color:#21759b;}
 #pg-siblings ul li a:hover { color:#0f3647; }
-#pg-siblings ul li.current_page_item a{ font-weight:bold; text-decoration:none; color:#333;}
+#pg-siblings ul li.current_page_item a{ font-weight:bold; text-decoration:none; color:#006699;}
 
 #pg-subs { padding:0 0 20px 0;}
 #pg-subs ul li {line-height:150%;}
