@@ -40,8 +40,7 @@ function get_subpage_and_sibling_links(){
                          );
         $sibling_content = wp_list_pages($sibling_page_args);
         if ($sibling_content){
-            $sibling_content_html = '<div id="pg-siblings"><h3 class="widget-title">'. get_the_title($post->post_parent) . ' <i>Menu</i></h3><ul>' . $sibling_content . "</ul></div>";
-            //str_replace('<li class="','<li class="lastlink ',$lastpage);
+            $sibling_content_html = '<div id="pg-siblings"><h3 class="widget-title"><a href="?page_id='. $post->post_parent . '" style="text-decoration:underline; color:#636363;">' . get_the_title($post->post_parent) . '</a> <!--i>Menu</i--></h3><ul style="padding:0 10px;">' . $sibling_content . "</ul></div>";            //str_replace('<li class="','<li class="lastlink ',$lastpage);
         }else{
             $sibling_content_html = '';
         }
@@ -59,7 +58,7 @@ function get_subpage_and_sibling_links(){
                          );
      $subpage_content = wp_list_pages($subpage_args);
      if ($subpage_content){
-         $subpage_content_html = '<div id="pg-subs"><h3 class="widget-title">'. get_the_title($page_id) . ' <i>Topics</i></h3><ul>' . $subpage_content . "</ul></div>";
+         $subpage_content_html = '<div id="pg-subs"><h3 class="widget-title">'. get_the_title($page_id) . ' <i>Topics</i></h3><ul style="padding:0 10px;">' . $subpage_content . "</ul></div>";
          
      }else{
          $subpage_content_html = '';
