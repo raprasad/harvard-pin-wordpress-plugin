@@ -57,7 +57,7 @@ function my_login_stylesheet() { ?>
     jQuery(document).ready(function($){
 
         // add "Show Admin Login Form" link
-        $( "#login" ).append('<a id="lnk_show_login_form">(Show Admin Login Form)</a>');
+        $( "#login" ).append('<p><a href="https://www.pin1.harvard.edu/pin/authenticate?__authen_application=FAS_FCOR_MCB_INTRANET">Harvard PIN Login</a></p><p><br /><a id="lnk_show_login_form" style="color:#cccccc;">(Show Admin Login Form)</a></p>');
         
         $("#lnk_show_login_form").click(function() {
             $('#loginform').show();   
