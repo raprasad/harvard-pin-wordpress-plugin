@@ -29,3 +29,8 @@
 
 div.breadcrumb-trail {margin:0; font-size:90%;}
 div.breadcrumb-trail span.trail-end {}
+    
+/* remove hyphenation from main theme */
+.site-content article {hyphens:none;word-wrap: none;
+        -webkit-hyphens: none;
+        -moz-hyphens: none;}    
