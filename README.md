@@ -28,3 +28,6 @@ Login to Wordpress using a Harvard Pin with the AuthZProxy service
     * 'CHECK_PIN_IP_VALUE' => 'false',
     * 'PRINT_DEBUG_STATMENTS' => 'false'
 * Activate the plugin through the Wordpress admin
+
+
+- fyi: This was a *get-it-done-fast* project -- e.g., there's no form to change plugin options, etc 
